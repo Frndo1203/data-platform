@@ -7,6 +7,6 @@ class Environment(Enum):
     """
 
     LOCAL = 'local'
-    DEV = 'develop'
+    DEVELOP = 'develop'
     STAGING = 'staging'
     PRODUCTION = 'production'
