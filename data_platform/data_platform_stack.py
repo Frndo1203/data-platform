@@ -61,13 +61,13 @@ class DataPlatformStack(core.Stack):
             vpc=self.custom_vpc,
             instance_identifier=f"orders-rds-{self.deploy_env}-db",
             port=5432,
-            vpc_placement=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
+            vpc_placement=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             subnet_group=rds.SubnetGroup(
                 self,
-                f"rds-subnet-group-{self.deploy_env}",
-                description=f"RDS subnet group for {self.deploy_env}",
+                f"rds-{self.deploy_env}-subnet",
+                description="place RDS on public subnet",
                 vpc=self.custom_vpc,
-                vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC)
+                vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             ),
             parameter_group=self.orders_rds_parameter_group,
             security_groups=[self.orders_rds_sg],
