@@ -13,8 +13,8 @@ from data_platform import active_environment
 
 
 class DataLakeStack(core.Stack):
-    def __init__(self, scope: core.Construct, id: str, deploy_env: active_environment, **kwargs) -> None:
-        self.deploy_env = deploy_env
+    def __init__(self, scope: core.Construct, **kwargs) -> None:
+        self.deploy_env = active_environment
         
         super().__init__(
             scope,
