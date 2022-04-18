@@ -61,7 +61,7 @@ class DataPlatformStack(core.Stack):
             vpc=self.custom_vpc,
             instance_identifier=f"orders-rds-{self.deploy_env}-db",
             port=5432,
-            vpc_placement=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             subnet_group=rds.SubnetGroup(
                 self,
                 f"rds-{self.deploy_env}-subnet",
