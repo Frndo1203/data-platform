@@ -4,5 +4,5 @@ from data_platform.data_lake.stack import DataLakeStack
 
 
 app = core.App()
-data_lake = DataLakeStack(app, "data-lake-stack")
+data_lake = DataLakeStack(app)
 app.synth()
