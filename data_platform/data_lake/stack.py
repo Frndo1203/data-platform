@@ -28,11 +28,11 @@ class DataLakeStack(core.Stack):
         
         self.raw_bucket.add_lifecycle_rule(
             transitions=[
-                s3.transition(
+                s3.Transition(
                     storage_class=s3.StorageClass.INTELLIGENT_TIERING,
                     transition_after=core.Duration.days(90)
                 ),
-                s3.transition(
+                s3.Transition(
                     storage_class=s3.StorageClass.GLACIER,
                     transition_after=core.Duration.days(360)
                 )
