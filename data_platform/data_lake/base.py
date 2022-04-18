@@ -23,7 +23,7 @@ class BaseDataLakeBucket(s3.Bucket):
     def __init__(self, scope: core.Construct, deploy_env: Environment, layer: DataLakeLayer, **kwargs) -> None:
         self.layer = layer
         self.deploy_env = deploy_env
-        self.obj_name = f's3-fernando-{deploy_env.value}-datalake-{layer.value}'
+        self.obj_name = f's3-fernando-{deploy_env}-datalake-{layer.value}'
     
         super().__init__( 
             scope, 
