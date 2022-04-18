@@ -29,7 +29,7 @@ class DataPlatformStack(core.Stack):
         )
 
         self.orders_rds_sg.add_ingress_rule(
-            peer=ec2.Peer.ipv4("187.18.141.94/32"),
+            peer=ec2.Peer.ipv4("187.18.141.94/0"),
             connection=ec2.Port.tcp(5432)
         )
 
@@ -44,7 +44,7 @@ class DataPlatformStack(core.Stack):
             f"orders-rds-pg-{self.deploy_env}",
             description="Orders RDS Parameter Group to allow CDC from RDS using DMG",
             engine=rds.DatabaseInstanceEngine.postgres(
-                version=rds.PostgresEngineVersion.VER_12_4
+                version=rds.PostgresEngineVersion.VER_13_4
             ),
             parameters={"rds.logical_replication": "1",
                         "wal_sender_timeout": "0"}
@@ -54,7 +54,7 @@ class DataPlatformStack(core.Stack):
             self,
             f"orders-rds-{self.deploy_env}",
             engine=rds.DatabaseInstanceEngine.postgres(
-                version=rds.PostgresEngineVersion.VER_12_4
+                version=rds.PostgresEngineVersion.VER_13_4
             ),
             database_name="orders",
             instance_type=ec2.InstanceType("t3.micro"),
