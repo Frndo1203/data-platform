@@ -63,11 +63,11 @@ class BaseDataLakeBucket(s3.Bucket):
             noncurrent_version_transitions=[
                 s3.NoncurrentVersionTransition(
                     storage_class=s3.StorageClass.INFREQUENT_ACCESS,
-                    transition_in_days=core.Duration(30)
+                    transition_in_days=core.Duration.days(30)
                 ),
                 s3.NoncurrentVersionTransition(
                     storage_class=s3.StorageClass.GLACIER,
-                    transition_in_days=core.Duration(60)
+                    transition_in_days=core.Duration.days(60)
                 )
             ]
         )
