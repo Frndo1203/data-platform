@@ -20,10 +20,10 @@ class BaseDataLakeBucket(s3.Bucket):
     Base class for all data lake buckets
     """
 
-    def __init__(self, scope: core.Construct, deploy_env: Environment, layer: DataLakeLayer, **kwargs) -> None:
+    def __init__(self, scope: core.Construct, layer: DataLakeLayer, **kwargs) -> None:
         self.layer = layer
-        self.deploy_env = deploy_env
-        self.obj_name = f's3-fernando-{deploy_env}-datalake-{layer.value}'
+        self.deploy_env = scope.deploy_env
+        self.obj_name = f's3-fernando-{self.deploy_env}-datalake-{layer.value}'
     
         super().__init__( 
             scope, 
