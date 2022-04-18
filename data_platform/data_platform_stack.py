@@ -29,7 +29,7 @@ class DataPlatformStack(core.Stack):
         )
 
         self.orders_rds_sg.add_ingress_rule(
-            peer=ec2.Peer.ipv4("0.0.0.0/0"),
+            peer=ec2.Peer.ipv4("187.18.141.94"),
             connection=ec2.Port.tcp(5432)
         )
 
