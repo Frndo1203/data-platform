@@ -53,9 +53,9 @@ class DataPlatformStack(core.Stack):
         self.orders_rds = rds.DatabaseInstance(
             self,
             f"orders-rds-{self.deploy_env}",
-            engine=rds.DatabaseInstanceEngine(
+            engine=rds.DatabaseInstanceEngine.postgres(
                 version=rds.PostgresEngineVersion.VER_12_4
-            )
+            ),
             database_name="orders",
             instance_type=ec2.InstanceType("t3.micro"),
             vpc=self.custom_vpc,
