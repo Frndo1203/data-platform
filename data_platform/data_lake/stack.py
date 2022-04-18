@@ -18,7 +18,7 @@ class DataLakeStack(core.Stack):
         
         super().__init__(
             scope,
-            id=f'{self.deploy_env.value}-datalake-stack', 
+            id=f'{self.deploy_env}-datalake-stack', 
             **kwargs
             )
     
