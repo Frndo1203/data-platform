@@ -1,19 +1,77 @@
+import os
+
 from aws_cdk import (
-    # Duration,
-    Stack,
-    # aws_sqs as sqs,
+    core,
+    aws_rds as rds,
+    aws_ec2 as ec2
 )
-from constructs import Construct
 
-class DataPlatformStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
-        super().__init__(scope, construct_id, **kwargs)
+class DataPlatformStack(core.Stack):
+    """
+        docstring for DataPlatformStack
+    """
+    def __init__(self, scope: core.Construct, **kwargs) -> None:
+        self.deploy_env = os.environ["ENVIRONMENT"]
+        super().__init__(
+            scope,
+            id=f'{self.deploy_env}-data-platform-stack',
+            **kwargs)
 
-        # The code that defines your stack goes here
+        self.custom_vpc = ec2.Vpc(self, f"vpc-{self.deploy_env}")
 
-        # example resource
-        # queue = sqs.Queue(
-        #     self, "DataPlatformQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
+        self.orders_rds_sg = ec2.SecurityGroup(
+            self,
+            f"orders-rds-sg-{self.deploy_env}",
+            vpc=self.custom_vpc,
+            allow_all_outbound=True,
+            security_group_name=f"orders-rds-sg-{self.deploy_env}"
+        )
+
+        self.orders_rds_sg.add_ingress_rule(
+            peer=ec2.Peer.ipv4("187.18.141.94/0"),
+            connection=ec2.Port.tcp(5432)
+        )
+
+        for subnet in self.custom_vpc.public_subnets:
+            self.orders_rds_sg.add_ingress_rule(
+                peer=ec2.Peer.ipv4(subnet.ipv4_cidr_block),
+                connection=ec2.Port.tcp(5432)
+            )
+
+        self.orders_rds_parameter_group= rds.ParameterGroup(
+            self,
+            f"orders-rds-pg-{self.deploy_env}",
+            description="Orders RDS Parameter Group to allow CDC from RDS using DMG",
+            engine=rds.DatabaseInstanceEngine.postgres(
+                version=rds.PostgresEngineVersion.VER_13_4
+            ),
+            parameters={"rds.logical_replication": "1",
+                        "wal_sender_timeout": "0"}
+        )
+
+        self.orders_rds = rds.DatabaseInstance(
+            self,
+            f"orders-rds-{self.deploy_env}",
+            engine=rds.DatabaseInstanceEngine.postgres(
+                version=rds.PostgresEngineVersion.VER_13_4
+            ),
+            database_name="orders",
+            instance_type=ec2.InstanceType("t3.micro"),
+            vpc=self.custom_vpc,
+            instance_identifier=f"orders-rds-{self.deploy_env}-db",
+            port=5432,
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
+            subnet_group=rds.SubnetGroup(
+                self,
+                f"rds-{self.deploy_env}-subnet",
+                description="place RDS on public subnet",
+                vpc=self.custom_vpc,
+                vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
+            ),
+            parameter_group=self.orders_rds_parameter_group,
+            security_groups=[self.orders_rds_sg],
+            removal_policy=core.RemovalPolicy.DESTROY,
+            **kwargs
+        )
+

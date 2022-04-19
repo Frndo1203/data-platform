@@ -3,7 +3,6 @@ from aws_cdk import core
 from aws_cdk import (
     aws_s3 as s3,
 )
-from data_platform.environment import Environment
 
 class DataLakeLayer(Enum):
     """
@@ -20,10 +19,10 @@ class BaseDataLakeBucket(s3.Bucket):
     Base class for all data lake buckets
     """
 
-    def __init__(self, scope: core.Construct, deploy_env: Environment, layer: DataLakeLayer, **kwargs) -> None:
+    def __init__(self, scope: core.Construct, deploy_env: str, layer: DataLakeLayer, **kwargs) -> None:
         self.layer = layer
         self.deploy_env = deploy_env
-        self.obj_name = f's3-fernando-{deploy_env.value}-datalake-{layer.value}'
+        self.obj_name = f's3-fernando-{deploy_env}-datalake-{layer.value}'
     
         super().__init__( 
             scope, 
@@ -34,6 +33,8 @@ class BaseDataLakeBucket(s3.Bucket):
             versioned=True,
             **kwargs
             )
+        
+        self.set_default_lifecycle_rules()
   
     @property
     def default_block_public_access(self):
@@ -62,11 +63,11 @@ class BaseDataLakeBucket(s3.Bucket):
             noncurrent_version_transitions=[
                 s3.NoncurrentVersionTransition(
                     storage_class=s3.StorageClass.INFREQUENT_ACCESS,
-                    transition_in_days=core.Duration(30)
+                    transition_after=core.Duration.days(30)
                 ),
                 s3.NoncurrentVersionTransition(
                     storage_class=s3.StorageClass.GLACIER,
-                    transition_in_days=core.Duration(60)
+                    transition_after=core.Duration.days(60)
                 )
             ]
         )
