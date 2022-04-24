@@ -8,5 +8,5 @@ app = core.App()
 data_lake = DataLakeStack(app)
 data_platform = DataPlatformStack(app)
 dms = DmsStack(app, common_stack=DataPlatformStack, 
-                data_lake_raw_bucket=data_lake.data_lake_raw_bucket)
+                raw_bucket=data_lake.raw_bucket)
 app.synth()

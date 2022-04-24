@@ -17,11 +17,11 @@ class RawDMSRole(iam.Role):
     def __init__(
         self,
         scope: core.Construct,
-        data_lake_raw_bucket: BaseDataLakeBucket,
+        raw_bucket: BaseDataLakeBucket,
         **kwargs,
     ) -> None:
         self.deploy_env = os.environ["ENVIRONMENT"]
-        self.data_lake_raw_bucket = data_lake_raw_bucket
+        self.raw_bucket = raw_bucket
         super().__init__(
             scope,
             id=f"iam-{self.deploy_env}-data-lake-raw-dms-role",
@@ -44,8 +44,8 @@ class RawDMSRole(iam.Role):
                         "s3:PutObject",
                     ],
                     resources=[
-                        self.data_lake_raw_bucket.bucket_arn,
-                        f"{self.data_lake_raw_bucket.bucket_arn}/*",
+                        self.raw_bucket.bucket_arn,
+                        f"{self.raw_bucket.bucket_arn}/*",
                     ],
                 )
             ],
@@ -60,10 +60,10 @@ class OrdersDMS(dms.CfnReplicationTask):
         self,
         scope: core.Construct,
         common_stack: DataPlatformStack,
-        data_lake_raw_bucket: BaseDataLakeBucket,
+        raw_bucket: BaseDataLakeBucket,
         **kwargs,
     ) -> None:
-        self.data_lake_raw_bucket = data_lake_raw_bucket
+        self.raw_bucket = raw_bucket
         self.common_stack = common_stack
         self.deploy_env = scope.deploy_env
         self.rds_endpoint = dms.CfnEndpoint(
@@ -97,13 +97,13 @@ class OrdersDMS(dms.CfnReplicationTask):
             endpoint_identifier=f"dms-target-{self.deploy_env}-orders-s3-endpoint",
             extra_connection_attributes="DataFormat=parquet;maxFileSize=131072;timestampColumnName=extracted_at;includeOpForFullLoad=true;cdcMaxBatchInterval=120",
             s3_settings=dms.CfnEndpoint.S3SettingsProperty(
-                bucket_name=self.data_lake_raw_bucket.bucket_name,
+                bucket_name=self.raw_bucket.bucket_name,
                 bucket_folder="orders",
                 compression_type="gzip",
                 csv_delimiter=",",
                 csv_row_delimiter="\n",
                 service_access_role_arn=RawDMSRole(
-                    scope, self.data_lake_raw_bucket
+                    scope, self.raw_bucket
                 ).role_arn,
             ),
         )
@@ -174,11 +174,11 @@ class DmsStack(core.Stack):
         self,
         scope: core.Construct,
         common_stack: DataPlatformStack,
-        data_lake_raw_bucket: BaseDataLakeBucket,
+        raw_bucket: BaseDataLakeBucket,
         **kwargs,
     ) -> None:
         self.deploy_env = os.environ["ENVIRONMENT"]
-        self.data_lake_raw_bucket = data_lake_raw_bucket
+        self.raw_bucket = raw_bucket
         super().__init__(scope, id=f"{self.deploy_env}-dms-stack", **kwargs)
 
-        self.dms_replication_task = OrdersDMS(self, common_stack, data_lake_raw_bucket)
+        self.dms_replication_task = OrdersDMS(self, common_stack, raw_bucket)
