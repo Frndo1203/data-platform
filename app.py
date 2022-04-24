@@ -7,6 +7,5 @@ from data_platform.dms.stack import DmsStack
 app = core.App()
 data_lake = DataLakeStack(app)
 data_platform = DataPlatformStack(app)
-dms = DmsStack(app, common_stack=DataPlatformStack, 
-                raw_bucket=data_lake.raw_bucket)
+dms = DmsStack(app, common_stack=data_platform, raw_bucket=data_lake.raw_bucket)
 app.synth()
