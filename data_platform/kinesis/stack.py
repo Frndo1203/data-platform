@@ -75,25 +75,25 @@ class FirehoseStack(core.Stack):
             extended_s3_destination_configuration=self.s3_config,
         )
 
-        @property
-        def s3_config(self):
-            return firehose.CfnDeliveryStream.ExtendedS3DestinationConfigurationProperty(
-                bucket_arn=self.data_lake_raw_bucket.bucket_arn,
-                compression_format="GZIP",
-                error_output_prefix="bad_records",
-                prefix="atomic_events/data=!{YYYY}-{MM}-{DD}/",
-                buffering_hints=firehose.CfnDeliveryStream.BufferingHintsProperty(
-                    interval_in_seconds=60,
-                    size_in_m_bs=1
-                    ),
-                role_arn=self.firehose_role.role_arn,
-            )
+    @property
+    def s3_config(self):
+        return firehose.CfnDeliveryStream.ExtendedS3DestinationConfigurationProperty(
+            bucket_arn=self.data_lake_raw_bucket.bucket_arn,
+            compression_format="GZIP",
+            error_output_prefix="bad_records",
+            prefix="atomic_events/data=!{YYYY}-{MM}-{DD}/",
+            buffering_hints=firehose.CfnDeliveryStream.BufferingHintsProperty(
+                interval_in_seconds=60,
+                size_in_m_bs=1
+                ),
+            role_arn=self.firehose_role.role_arn,
+        )
         
 
-        @property
-        def firehose_role(self):
-            return RawFirehoseRole(
-                self,
-                self.data_lake_raw_bucket,
-                deploy_env=self.deploy_env,
-            )
+    @property
+    def firehose_role(self):
+        return RawFirehoseRole(
+            self,
+            self.data_lake_raw_bucket,
+            deploy_env=self.deploy_env,
+        )
