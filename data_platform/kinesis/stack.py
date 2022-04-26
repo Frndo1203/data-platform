@@ -11,8 +11,7 @@ from data_platform.data_lake.base import BaseDataLakeBucket
 class RawFirehoseRole(iam.Role):
     def __init__(
         self, 
-        scope: core.Construct, 
-        deploy_env: deploy_env,
+        scope: core.Construct,
         data_lake_raw_bucket: BaseDataLakeBucket,
         **kwargs
     ) -> None:
@@ -20,9 +19,9 @@ class RawFirehoseRole(iam.Role):
         self.data_lake_raw_bucket = data_lake_raw_bucket
         super().__init__(
             scope,
-            id=f"{deploy_env}-raw-firehose-role",
+            id=f"{self.deploy_env}-raw-firehose-role",
             assumed_by=iam.ServicePrincipal("firehose.amazonaws.com"),
-            description=f"Role for {deploy_env} raw firehose"
+            description=f"Role for {self.deploy_env} raw firehose"
         )
         self.add_policy()
     
@@ -53,7 +52,7 @@ class RawFirehoseRole(iam.Role):
         return policy
     
 
-class FirehoseStack(core.stack()):
+class FirehoseStack(core.Stack()):
     def __init__(
         self,
         scope: core.Construct,
@@ -95,6 +94,5 @@ class FirehoseStack(core.stack()):
         def firehose_role(self):
             return RawFirehoseRole(
                 self,
-                self.deploy_env,
                 self.data_lake_raw_bucket,
             )
