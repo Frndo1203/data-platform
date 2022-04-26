@@ -21,7 +21,7 @@ class RawFirehoseRole(iam.Role):
             scope,
             id=f"{self.deploy_env}-raw-firehose-role",
             assumed_by=iam.ServicePrincipal("firehose.amazonaws.com"),
-            description=f"Role for {self.deploy_env} raw firehose"
+            description=f"Role for {self.deploy_env} raw firehose",
         )
         self.add_policy()
     
@@ -57,7 +57,7 @@ class FirehoseStack(core.Stack()):
         self,
         scope: core.Construct,
         data_lake_raw_bucket: BaseDataLakeBucket,
-        **kwargs
+        **kwargs,
     ) -> None:
         self.deploy_env = os.environ["ENVIRONMENT"]
         self.data_lake_raw_bucket = data_lake_raw_bucket
@@ -95,4 +95,5 @@ class FirehoseStack(core.Stack()):
             return RawFirehoseRole(
                 self,
                 self.data_lake_raw_bucket,
+                deploy_env=self.deploy_env,
             )
