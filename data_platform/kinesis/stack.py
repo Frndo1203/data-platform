@@ -52,7 +52,7 @@ class RawFirehoseRole(iam.Role):
         return policy
     
 
-class FirehoseStack(core.Stack()):
+class FirehoseStack(core.Stack):
     def __init__(
         self,
         scope: core.Construct,
