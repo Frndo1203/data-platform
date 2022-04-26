@@ -81,7 +81,7 @@ class FirehoseStack(core.Stack):
             bucket_arn=self.data_lake_raw_bucket.bucket_arn,
             compression_format="GZIP",
             error_output_prefix="bad_records",
-            prefix="atomic_events/data=!{YYYY}-{MM}-{DD}/",
+            prefix="atomic_events/landing_date=!{timestamp:yyyy}-!{timestamp:MM}-!{timestamp:dd}/",
             buffering_hints=firehose.CfnDeliveryStream.BufferingHintsProperty(
                 interval_in_seconds=60,
                 size_in_m_bs=1
